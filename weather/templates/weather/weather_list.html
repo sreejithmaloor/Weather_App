@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>🌦️ Weather App</title>
+    <link rel="icon" type="image/png" href="https://openweathermap.org/img/wn/01d.png" />
+    <link rel="stylesheet" href="{% static 'weather/css/style.css' %}" />
+</head>
+<body>
+    <div class="container">
+        <h1>Weather App</h1>
+        <div class="search-box">
+            <input type="text" id="cityInput" placeholder="Enter city name" />
+            <button id="searchBtn">Get Weather</button>
+        </div>
+        <div id="loading" class="loader" style="display: none;"></div>   
+        <div id="weatherResult" class="weather-info"></div>
+        
+        <!-- Recent Searches Section -->
+        <div class="recent-searches">
+            <h3>Recent Searches</h3>
+            <ul id="recentSearchesList">
+                {% for search in recent_searches %}
+                    <li data-city="{{ search.city }}">{{ search.city }}, {{ search.country }} - {{ search.temperature }}°C ({{ search.condition }})</li>
+                {% empty %}
+                    <li>No recent searches</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    
+    <footer>
+        © 2025 Weather App by [Sreejith]
+    </footer>
+    
+    <script src="{% static 'weather/js/script.js' %}"></script>
+</body>
+</html>
