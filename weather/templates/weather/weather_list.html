@@ -20,7 +20,10 @@
         
         <!-- Recent Searches Section -->
         <div class="recent-searches">
-            <h3>Recent Searches</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3>Recent Searches</h3>
+                <button id="clearBtn" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">Clear All</button>
+            </div>
             <ul id="recentSearchesList">
                 {% for search in recent_searches %}
                     <li data-city="{{ search.city }}">{{ search.city }}, {{ search.country }} - {{ search.temperature }}°C ({{ search.condition }})</li>
@@ -29,7 +32,6 @@
                 {% endfor %}
             </ul>
         </div>
-    </div>
     
     <footer>
         © 2025 Weather App by [Sreejith]

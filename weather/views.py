@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect  # ✅ make sure 'redirect' is included
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
@@ -64,3 +64,8 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
+
+# ✅ Add this at the end
+def clear_searches(request):
+    WeatherSearch.objects.all().delete()
+    return redirect('weather_view')  # Make sure your urls.py has this named view

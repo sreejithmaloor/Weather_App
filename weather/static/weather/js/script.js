@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const weatherResult = document.getElementById('weatherResult');
     const loading = document.getElementById('loading');
     const recentSearchesList = document.getElementById('recentSearchesList');
+    const clearBtn = document.getElementById('clearBtn');
     
     // Load last searched city from localStorage
     const lastCity = localStorage.getItem('lastCity');
@@ -11,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cityInput.value = lastCity;
         getWeather(lastCity);
     }
-    
+
     // Search button click event
     searchBtn.addEventListener('click', () => {
         const city = cityInput.value.trim();
@@ -21,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         getWeather(city);
     });
-    
+
     // Recent search item click event
     recentSearchesList.addEventListener('click', (e) => {
         if (e.target.tagName === 'LI' && e.target.dataset.city) {
@@ -29,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
             getWeather(e.target.dataset.city);
         }
     });
-    
+
     // Enter key press in input field
     cityInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
@@ -39,7 +40,29 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
-    
+
+    // Clear button click event
+    if (clearBtn) {
+        clearBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/clear/', {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    }
+                });
+
+                if (response.ok) {
+                    recentSearchesList.innerHTML = '<li>No recent searches</li>';
+                    localStorage.removeItem('lastCity');
+                    weatherResult.innerHTML = '';
+                }
+            } catch (error) {
+                console.error('Error clearing searches:', error);
+            }
+        });
+    }
+
     async function getWeather(city) {
         loading.style.display = 'block';
         weatherResult.innerHTML = '';
@@ -62,17 +85,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             displayWeather(data);
             localStorage.setItem('lastCity', city);
-            
-            // Refresh recent searches
             fetchRecentSearches();
-            
         } catch (error) {
             showError(error.message);
         } finally {
             loading.style.display = 'none';
         }
     }
-    
+
     function displayWeather(data) {
         const weatherHTML = `
             <h2>${data.city}, ${data.country}</h2>
@@ -84,18 +104,15 @@ document.addEventListener('DOMContentLoaded', () => {
             <img src="https://openweathermap.org/img/wn/${data.icon}@2x.png" alt="Weather Icon">
         `;
         weatherResult.innerHTML = weatherHTML;
-        
-        // Change background based on condition
         changeBackground(data.condition.toLowerCase());
     }
-    
+
     function showError(message) {
         weatherResult.innerHTML = `<p class="error">${message}</p>`;
     }
-    
+
     function changeBackground(condition) {
         const body = document.body;
-        
         if (condition.includes('clear')) {
             body.style.background = "linear-gradient(to right, #ff7e5f, #feb47b)";
         } else if (condition.includes('rain') || condition.includes('drizzle')) {
@@ -110,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
             body.style.background = "linear-gradient(to right, #83a4d4, #b6fbff)";
         }
     }
-    
+
     async function fetchRecentSearches() {
         try {
             const response = await fetch('/');
@@ -123,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error fetching recent searches:', error);
         }
     }
-    
+
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
